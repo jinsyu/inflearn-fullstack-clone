@@ -1,9 +1,10 @@
 "use server";
 
 import { saltAndHashPassword } from "@/lib/password-utils";
+import { signIn } from "next-auth/react";
 import { prisma } from "@/prisma";
 
-export default async function signUp({
+export async function signUp({
   email,
   password,
 }: {
