@@ -24,8 +24,9 @@ import { Request } from 'express';
 import { Prisma } from '@prisma/client';
 import { UpdateCourseDto } from './dto/update-course-dto';
 import { Course } from 'src/_gen/prisma-class/course';
+import { AuthUserId } from 'src/common/decorators/user.decorator';
 
-@ApiTags('courses')
+@ApiTags('강의 코스')
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
@@ -37,8 +38,11 @@ export class CoursesController {
     description: '코스를 생성합니다.',
     type: Course,
   })
-  createCourse(@Req() req: Request, @Body() createCourseDto: CreateCourseDto) {
-    return this.coursesService.createCourse(req.user.sub, createCourseDto);
+  createCourse(
+    @AuthUserId() userId: string,
+    @Body() createCourseDto: CreateCourseDto,
+  ) {
+    return this.coursesService.createCourse(userId, createCourseDto);
   }
 
   @Get()
@@ -115,10 +119,10 @@ export class CoursesController {
   })
   updateCourse(
     @Param('id', ParseUUIDPipe) id: string,
-    @Req() req: Request,
+    @AuthUserId() userId: string,
     @Body() updateCourseDto: UpdateCourseDto,
   ) {
-    return this.coursesService.updateCourse(id, req.user.sub, updateCourseDto);
+    return this.coursesService.updateCourse(id, userId, updateCourseDto);
   }
 
   @Delete(':id')
@@ -128,7 +132,10 @@ export class CoursesController {
     description: '코스 정보를 삭제합니다.',
     type: Course,
   })
-  deleteCourse(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
-    return this.coursesService.deleteCourse(id, req.user.sub);
+  deleteCourse(
+    @Param('id', ParseUUIDPipe) id: string,
+    @AuthUserId() userId: string,
+  ) {
+    return this.coursesService.deleteCourse(id, userId);
   }
 }
